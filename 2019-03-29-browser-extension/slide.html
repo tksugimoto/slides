@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>悪意あるブラウザ拡張への対策方法 - [2019/03/29] WEBエンジニア勉強会 #12 LT</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      img {
+        border: 2px solid gray;
+      }
+      .remark-inline-code {
+        background-color: rgb(220, 220, 220);
+        padding: 5px;
+      }
+      .image-2-container img {
+        width: 48%;
+        vertical-align: top;
+      }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+## 悪意あるブラウザ拡張への対策方法
+
+2019/03/29 [WEBエンジニア勉強会 #12](https://techplay.jp/event/716201)
+
+[@tksugimoto](https://twitter.com/tksugimoto)
+
+---
+
+# 話すこと
+
+- ブラウザ拡張とは
+- ブラウザ拡張の危険性
+- 悪意あるブラウザ拡張への対策
+
+# 話さないこと
+- ブラウザ拡張の作り方
+
+---
+
+# ブラウザ拡張とは
+- ウェブブラウザの機能を拡張する
+- JavaScript, JSON, HTML, CSSなどフロントエンド技術で作成できる
+
+--
+
+## 詳細
+- 対象ブラウザ
+- 何ができるか？
+- 通常のWebアプリとの違い
+
+---
+
+## 対象ブラウザ
+- Chromium系
+    - Google Chrome
+    - Opera
+    - Vivaldi
+    - etc.
+- Mozilla Firefox
+- Microsoft Edge
+
+---
+
+## 何ができるか？
+- ページへのアクセス
+    - CSSの追加
+    - JavaScriptの実行
+- 通信への割り込み
+- background実行
+- etc.
+
+![](./uploads/upload_0a951255f4709bf4438c5f77c9b488da.png)
+![](./uploads/upload_868af7a5dcd486a3b6d99f00e0c2f4ea.png)
+
+---
+## 通常のWebアプリとの違い
+- メインコンテンツは拡張ではなくページであることが多い
+    - 拡張は補足的な働きをする
+- **Same-Origin Policyの制限を受けない**
+    - 全ドメインにアクセスできる
+- **ページ遷移＆ページ（タブ）を横断する操作が可能**
+
+---
+
+# 自己紹介
+- 名前： 杉本 貴史
+    - Twitter： [@tksugimoto](https://twitter.com/tksugimoto)
+    - GitHub： [@tksugimoto](https://github.com/tksugimoto)
+- 所属： TIS株式会社
+    - （宣伝）アプリケーション開発ノウハウ・ツール 公開中！ → [fintan.jp](https://fintan.jp/)
+--
+- 仕事： サーバーサイド（リアクティブシステム）
+- 趣味： フロントエンド（主にChrome拡張）
+    - [ローカルファイルリンク有効化 - Chrome ウェブストア](https://chrome.google.com/webstore/detail/enable-local-file-links/nikfmfgobenbhmocjaaboihbeocackld)
+        - 機能: `file:///` 形式のリンクをクリックで新規タブで開く
+        ![](./uploads/upload_44914aa8d497157496ae4a47a675544f.png)
+
+---
+
+# ブラウザ拡張の危険性
+- 悪意あるブラウザ拡張は何ができるか？
+- 事例
+- 拡張の権限との関係
+
+---
+
+### Q. 悪意あるブラウザ拡張は何ができるか？
+### A. ユーザーの代わりに操作が可能
+
+#### 拡張が取得・操作できる情報
+- ページに表示されているもの
+- セッション (cookie, localStorage) 情報
+    - httpOnly な cookie でも取得可能
+- POST Bodyの中身
+    - ID・Password・CSRFトークンを含む
+
+#### 暗号化無し (`http://`) で通信している状況に近い
+- 盗聴
+- 改ざん
+
+---
+
+## 事例
+### 2016/11: HTTP Headers
+[HTTP Headers という 5万人が使っている Chrome 拡張のマルウェア疑惑。セッション盗まれて BTC も盗まれそうになった話。 - clock-up-blog](https://blog.clock-up.jp/entry/2016/11/03/http-headers-malware)
+
+### 2018/07: Stylish
+[閲覧履歴の収集が発覚した「Stylish」拡張機能、“Chrome ウェブストア”からも削除 - 窓の杜](https://forest.watch.impress.co.jp/docs/news/1131353.html)
+
+---
+
+## 拡張の権限との関係
+### 権限の例
+- アクセスしたウェブサイト上にある自分の全データの読み取りと変更
+- `<ドメイン名>` の全サイト上にある自分のデータの読み取りと変更
+- 閲覧履歴の読み取り
+- 権限なし
+
+---
+
+### アクセスしたウェブサイト上にある自分の全データの読み取りと変更
+#### すべてのページの情報に常時アクセス可能
+
+![](./uploads/upload_f1195d238ab1ede20066a6a275ef7fec.png)
+
+.footnote[
+    ※ 例に出している拡張に悪意があるわけではありません
+]
+
+---
+
+### `<ドメイン名>` の全サイト上にある自分のデータの読み取りと変更
+#### 一部のページの情報に常時アクセス可能
+
+![](./uploads/upload_4101c3227a8bc2d8ed958575d69b318b.png)
+
+.footnote[
+    ※ 例に出している拡張に悪意があるわけではありません
+]
+
+---
+
+### 閲覧履歴の読み取り
+#### すべての閲覧履歴にアクセス可能
+ページの情報への常時アクセスはできない
+
+![](./uploads/upload_87dafe0172200c67a07e15e1bb870321.png)
+
+.footnote[
+    ※ 例に出している拡張に悪意があるわけではありません
+]
+
+---
+
+### 権限なし
+#### ユーザーがアクションしたときに限り、現在のページの情報にアクセス可能
+
+![](./uploads/upload_5e2d900496ab32c31ee60408d4ece266.png)
+
+- アドレスバー右の拡張アイコンをクリックしたとき
+- 右クリックメニューから拡張のメニューを選択したとき
+
+.footnote[
+    ※ 例に出している拡張に悪意があるわけではありません
+]
+
+---
+
+# 悪意ある<br>ブラウザ拡張への対策
+- 要求権限の少ない拡張を選択
+- ブラウザ側で権限を制限
+- 自作
+
+---
+
+## 要求権限の少ない拡張を選択
+- 不要そうな権限を要求してくる拡張は悪意ある可能性がある
+    - 例）ボタンを押すと特定のURLを開くだけの拡張なのに、Googleドメインの権限を要求をしてくる
+    - 例）特定のサービスに特化している拡張なのに、全ドメインの権限を要求してくる
+- 権限をインストール時ではなく、インストール後に都度要求・許可することも技術的には可能
+
+    ![](./uploads/upload_1c3db3ea4bca41f0df4701332aa165ea.png)
+
+---
+
+## ブラウザ側で権限を制限
+- 制限方法
+    - 拡張アイコンを右クリック→「サイトデータの読み取りと変更を行います」から
+    - 拡張管理ページから
+- 制限できるブラウザ
+    - Chrome
+    - (Vivaldi)
+        - 拡張アイコンを右クリックから制限できない
+
+---
+
+### 拡張アイコンを右クリック→「サイトデータの読み取りと変更を行います」から制限
+- 拡張機能をクリックしたときのみ許可
+- 現在表示しているサイトを許可
+- すべてのサイトで許可
+
+.image-2-container[
+    ![](./uploads/upload_d4c3ee39c2df7621c1f040bd6a1087a4.png)
+    ![](./uploads/upload_6d7308ea8eaaadcb3260bd7650ac8c3e.png)
+]
+
+---
+
+### 拡張管理ページから制限
+複数のサイトを許可したいときは追加が楽
+
+![](./uploads/upload_83c327612e1867d92136d73f40956899.png)
+
+---
+
+## 自作
+- 自作すれば（バグはあるかもしれないけど）情報を抜き取られるということは無い
+    - ※ 外部ライブラリを使用する際は、悪意あるライブラリに注意
+        - 乗っ取りの可能性もある
+            - [2018/11/27に判明したnpmパッケージ乗っ取りについて - Qiita](https://qiita.com/azs/items/b15bc456bee3a7892950)
+- ソースが公開されている場合は、安全性を確認して、開発者モードでインストールするのもあり
+
+---
+
+# まとめ
+- ブラウザ拡張とは
+- ブラウザ拡張の危険性
+- 悪意あるブラウザ拡張への対策
+    - 要求権限の少ない拡張を選択
+    - ブラウザ側で権限を制限
+    - 自作
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
